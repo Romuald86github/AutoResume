@@ -1,5 +1,5 @@
 # src/app/app.py
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template # type: ignore
 from werkzeug.utils import secure_filename
 import os
 import joblib
