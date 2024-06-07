@@ -1,0 +1,26 @@
+<!-- src/app/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Matching System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Resume Matching System</h1>
+        <form id="upload-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+            <label for="resumes">Upload Resumes (PDF):</label>
+            <input type="file" id="resumes" name="resumes" accept="application/pdf" multiple required>
+
+            <label for="job-description">Upload Job Description (PDF) or enter text:</label>
+            <input type="file" id="job-description-file" name="job_description" accept="application/pdf">
+            <textarea id="job-description-text" name="job_description" rows="5" cols="50" placeholder="Enter job description text"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
