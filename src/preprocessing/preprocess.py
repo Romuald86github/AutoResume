@@ -1,38 +1,60 @@
 import os
 import re
 import nltk
+import string
 nltk.download('all')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 
 
-stop_words = set(stopwords.words('english'))
+def remove_punctuation(text):
+    # Create a translation table to remove punctuation
+    translator = str.maketrans('', '', string.punctuation)
+    
+    # Remove punctuation from the text
+    text_without_punctuation = text.translate(translator)
+    
+    return text_without_punctuation
 
-def clean_text(text):
+def preprocess_text(text):
+    # Convert text to lowercase
     text = text.lower()
-    text = re.sub(r'\d+', '', text)
+
+    # Remove punctuation
+    text = remove_punctuation(text)
+
+    # Normalize whitespace
     text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'[^\w\s]', '', text)
-    return text
 
-def tokenize_and_remove_stopwords(text):
-    tokens = word_tokenize(text)
-    filtered_tokens = [token for token in tokens if token not in stop_words]
-    return filtered_tokens
+    # Tokenize the text
+    tokens = nltk.word_tokenize(text)
 
-def preprocess_text(input_dir, output_dir):
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    filtered_tokens = [word for word in tokens if word not in stop_words]
+
+    # Join the filtered tokens back into a single string
+    preprocessed_text = ' '.join(filtered_tokens)
+
+    return preprocessed_text
+
+def preprocess_files(input_dir, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
     for filename in os.listdir(input_dir):
         if filename.endswith(".txt"):
-            with open(os.path.join(input_dir, filename), 'r') as file:
+            file_path = os.path.join(input_dir, filename)
+            with open(file_path, 'r') as file:
                 text = file.read()
-            clean = clean_text(text)
-            tokens = tokenize_and_remove_stopwords(clean)
-            with open(os.path.join(output_dir, filename), 'w') as text_file:
-                text_file.write(' '.join(tokens))
+
+            preprocessed_text = preprocess_text(text)
+
+            output_file_path = os.path.join(output_dir, filename)
+            with open(output_file_path, 'w') as output_file:
+                output_file.write(preprocessed_text)
 
 if __name__ == "__main__":
-    preprocess_text('../../data/processed/resumes', '../../data/processed/resumes')
-    preprocess_text('../../data/processed/job_descriptions', '../../data/processed/job_descriptions')
+    preprocess_files('../../data/processed/resumes', '../../data/processed/preprocessed_resumes')
+    preprocess_files('../../data/processed/job_descriptions', '../../data/processed/preprocessed_job_descriptions')

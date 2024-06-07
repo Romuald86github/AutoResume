@@ -1,46 +1,62 @@
+import os
 import joblib
+from sklearn.metrics.pairwise import cosine_similarity
+from tensorflow.keras.models import load_model # type: ignore
 import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from keras.models import load_model
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from sklearn.metrics import ndcg_score
 
-def evaluate_sklearn_model(model, X_test, y_test):
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    return accuracy, precision, recall, f1
+def evaluate_cosine_similarity_model(X_resumes, X_jd):
+    similarity_matrix = joblib.load('models/cosine_similarity_model.pkl')
+    mean_cosine_similarity = np.mean(similarity_matrix.diagonal())
+    
+    print(f"Cosine Similarity Model:")
+    print(f"Mean Cosine Similarity: {mean_cosine_similarity:.4f}")
+    
+    return mean_cosine_similarity
 
-def evaluate_lstm_model(model, X_test, y_test):
-    y_pred = (model.predict(X_test) > 0.5).astype("int32")
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    return accuracy, precision, recall, f1
+def evaluate_semantic_similarity_model(X_resumes, X_jd):
+    model = load_model('models/semantic_similarity_model.h5')
+    resume_embeddings = model.predict(X_resumes)
+    jd_embeddings = model.predict(X_jd)
+    mean_cosine_similarity = np.mean(cosine_similarity(resume_embeddings, jd_embeddings))
+    
+    print(f"Semantic Similarity Model:")
+    print(f"Mean Cosine Similarity: {mean_cosine_similarity:.4f}")
+    
+    return mean_cosine_similarity
+
+def evaluate_siamese_model(X_resumes, X_jd):
+    model = load_model('models/siamese_model.h5')
+    resume_embeddings = model.predict(X_resumes)
+    jd_embeddings = model.predict(X_jd)
+    mean_euclidean_distance = np.mean(np.sqrt(np.sum((resume_embeddings - jd_embeddings) ** 2, axis=1)))
+    
+    print(f"Siamese Model:")
+    print(f"Mean Euclidean Distance: {mean_euclidean_distance:.4f}")
+    
+    return -mean_euclidean_distance
+
+def evaluate_ranking_model(X_resumes, X_jd):
+    model = load_model('models/ranking_model.h5')
+    y_pred = model.predict([X_resumes, X_jd]).flatten()
+    ndcg = ndcg_score(np.arange(len(X_resumes)), y_pred)
+    
+    print(f"Ranking Model:")
+    print(f"NDCG: {ndcg:.4f}")
+    
+    return ndcg
 
 if __name__ == "__main__":
-    X_test, _, _ = joblib.load('../../data/processed/resume_vectors.pkl')
-    y_test = [1] * (len(X_test) // 2) + [0] * (len(X_test) // 2)  # Dummy labels
+    _, X_resumes, _ = joblib.load('../../data/processed/resume_vectors.pkl')
+    _, X_jd, _ = joblib.load('../../data/processed/jd_vectors.pkl')
 
-    models = ['models/logistic_regression.pkl', 'models/svm.pkl', 'models/random_forest.pkl', 'models/lstm_model.h5']
-    best_model = None
-    best_score = 0
+    model_scores = {
+        'cosine_similarity': evaluate_cosine_similarity_model(X_resumes, X_jd),
+        'semantic_similarity': evaluate_semantic_similarity_model(X_resumes, X_jd),
+        'siamese': evaluate_siamese_model(X_resumes, X_jd),
+        'ranking': evaluate_ranking_model(X_resumes, X_jd)
+    }
 
-    for model_file in models:
-        if model_file.endswith('.pkl'):
-            model = joblib.load(model_file)
-            accuracy, precision, recall, f1 = evaluate_sklearn_model(model, X_test, y_test)
-        else:
-            model = load_model(model_file)
-            accuracy, precision, recall, f1 = evaluate_lstm_model(model, X_test, y_test)
-        
-        score = f1  # Using F1 score as the selection metric
-        if score > best_score:
-            best_score = score
-            best_model = model_file
-
-    print(f"Best Model: {best_model} with F1 Score: {best_score}")
-    joblib.dump(best_model, 'models/best_model.pkl')
+    # Select the best model based on the evaluation metrics
+    best_model_name = max(model_scores, key=model_scores.get)
+    best_model = joblib.load(f'models/{best_model_name}.pkl') if best_model_name.endswith('.pkl') else load_model(f'models/{best_model_name}.h5')
