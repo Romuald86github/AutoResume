@@ -47,7 +47,7 @@ def evaluate_ranking_model(X_resumes, X_jd):
     return ndcg
 
 if __name__ == "__main__":
-    resumes_data = joblib.load('data/presume_vectors.pkl')
+    resumes_data = joblib.load('data/resume_vectors.pkl')
     jd_data = joblib.load('data/job_description_vectors.pkl')
 
     X_resumes = resumes_data['raw_texts']
