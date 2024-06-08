@@ -9,6 +9,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Layer
 import tensorflow as tf
 from tensorflow.keras.saving import register_keras_serializable
+from tensorflow.keras.losses import MeanSquaredError
 
 # Define the LSTMWrapper class
 class LSTMWrapper(Layer):
@@ -36,6 +37,11 @@ class EuclideanDistanceLayer(Layer):
 
     def call(self, inputs):
         return euclidean_distance(inputs)
+
+# Register the mse function
+@register_keras_serializable()
+def mse(y_true, y_pred):
+    return MeanSquaredError()(y_true, y_pred)
 
 # Preprocess and tokenize the text data
 def preprocess_texts(texts, tokenizer, max_len=500):
@@ -91,7 +97,7 @@ def evaluate_siamese_model(X_resumes, X_jd):
     return -mean_euclidean_distance
 
 def evaluate_ranking_model(X_resumes, X_jd):
-    model = load_model('models/ranking_model.h5')
+    model = load_model('models/ranking_model.h5', custom_objects={'mse': mse})
     y_pred = model.predict(X_resumes).flatten()
     ndcg = ndcg_score([np.arange(len(X_resumes))], [y_pred])
     
@@ -136,7 +142,7 @@ if __name__ == "__main__":
         best_model = joblib.load(f'models/{best_model_name}')
         joblib.dump(best_model, f'{best_model_path}.pkl')
     else:
-        best_model = load_model(f'models/{best_model_name}', custom_objects={'LSTMWrapper': LSTMWrapper, 'EuclideanDistanceLayer': EuclideanDistanceLayer})
+        best_model = load_model(f'models/{best_model_name}', custom_objects={'LSTMWrapper': LSTMWrapper, 'EuclideanDistanceLayer': EuclideanDistanceLayer, 'mse': mse})
         best_model.save(f'{best_model_path}.h5')
 
     print(f"The best model is {best_model_name} and has been saved as {best_model_path}.")
