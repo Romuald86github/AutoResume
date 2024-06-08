@@ -39,7 +39,7 @@ def evaluate_siamese_model(X_resumes, X_jd):
 def evaluate_ranking_model(X_resumes, X_jd):
     model = load_model('models/ranking_model.h5')
     y_pred = model.predict([X_resumes, X_jd]).flatten()
-    ndcg = ndcg_score(np.arange(len(X_resumes)), y_pred)
+    ndcg = ndcg_score([np.arange(len(X_resumes))], [y_pred])
     
     print(f"Ranking Model:")
     print(f"NDCG: {ndcg:.4f}")
@@ -53,21 +53,26 @@ if __name__ == "__main__":
     X_resumes = resumes_data['raw_texts']
     X_jd = jd_data['raw_texts']
 
-    print(f"resumes_data: {resumes_data}")
-    print(f"jd_data: {jd_data}")
-    print(f"X_resumes: {X_resumes}")
-    print(f"X_jd: {X_jd}")
-
     model_scores = {
-        'cosine_similarity': evaluate_cosine_similarity_model(X_resumes, X_jd),
-        'semantic_similarity': evaluate_semantic_similarity_model(X_resumes, X_jd),
-        'siamese': evaluate_siamese_model(X_resumes, X_jd),
-        'ranking': evaluate_ranking_model(X_resumes, X_jd)
+        'cosine_similarity_model.pkl': evaluate_cosine_similarity_model(X_resumes, X_jd),
+        'semantic_similarity_model.h5': evaluate_semantic_similarity_model(X_resumes, X_jd),
+        'siamese_model.h5': evaluate_siamese_model(X_resumes, X_jd),
+        'ranking_model.h5': evaluate_ranking_model(X_resumes, X_jd)
     }
 
     # Select the best model based on the evaluation metrics
     best_model_name = max(model_scores, key=model_scores.get)
     
-    # Save the best model name to a file
-    with open('models/best_model_name.txt', 'w') as f:
-        f.write(best_model_name)
+    # Create the 'models/' directory if it doesn't exist
+    os.makedirs('models', exist_ok=True)
+    
+    # Save the best model
+    best_model_path = os.path.join('models', 'best_model')
+    if best_model_name.endswith('.pkl'):
+        best_model = joblib.load(f'models/{best_model_name}')
+        joblib.dump(best_model, f'{best_model_path}.pkl')
+    else:
+        best_model = load_model(f'models/{best_model_name}')
+        best_model.save(f'{best_model_path}.h5')
+
+    print(f"The best model is {best_model_name} and has been saved as {best_model_path}")
