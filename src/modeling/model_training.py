@@ -46,7 +46,7 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(x=[X_resumes_pad, X_jd_pad], y=np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+    model.fit([X_resumes_pad, X_jd_pad], y=np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
