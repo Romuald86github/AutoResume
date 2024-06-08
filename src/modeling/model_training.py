@@ -101,6 +101,10 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     resume_embedding = shared_lstm(resume_input)
     jd_embedding = shared_lstm(jd_input)
 
+    def euclidean_distance(vects):
+        x, y = vects
+        return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
+
     distance = Lambda(euclidean_distance)([resume_embedding, jd_embedding])
     model = Model(inputs=[resume_input, jd_input], outputs=distance)
     model.compile(loss=MeanSquaredError(), optimizer=Adam())
