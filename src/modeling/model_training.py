@@ -13,8 +13,8 @@ from tensorflow.keras.losses import MeanSquaredError # type: ignore
 
 def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd):
     # Compute cosine similarity matrix
-    X_resumes_transformed = vectorizer_resumes.transform(X_resumes)
-    X_jd_transformed = vectorizer_jd.transform(X_jd)
+    X_resumes_transformed = vectorizer_resumes.fit_transform(X_resumes)
+    X_jd_transformed = vectorizer_jd.fit_transform(X_jd)
     similarity_matrix = cosine_similarity(X_resumes_transformed, X_jd_transformed)
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
 
