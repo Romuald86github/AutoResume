@@ -23,6 +23,11 @@ def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorize
 
     # Compute cosine similarity matrix
     similarity_matrix = cosine_similarity(X_resumes_transformed.toarray(), X_jd_transformed.toarray())
+
+    # Create the 'models/' directory if it doesn't exist
+    os.makedirs('models', exist_ok=True)
+
+    # Save the cosine similarity matrix
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
 
 def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500):
