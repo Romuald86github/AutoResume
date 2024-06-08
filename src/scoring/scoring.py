@@ -42,8 +42,8 @@ def mse(y_true, y_pred):
     return MeanSquaredError()(y_true, y_pred)
 
 # Preprocess and tokenize the text data
-def preprocess_text(text, tokenizer, max_len=500):
-    sequences = tokenizer.texts_to_sequences([text])
+def preprocess_text(texts, tokenizer, max_len=500):
+    sequences = tokenizer.texts_to_sequences(texts)
     padded_sequences = pad_sequences(sequences, maxlen=max_len)
     return padded_sequences
 
@@ -60,7 +60,7 @@ def score_resumes(job_description, resume_vectors_file, jd_vectors_file, best_mo
     tokenizer.fit_on_texts(X_resumes + X_jd)
 
     # Preprocess the job description
-    preprocessed_jd = preprocess_text(job_description, tokenizer)
+    preprocessed_jd = preprocess_text([job_description], tokenizer)
 
     # Load the best model
     if best_model_path.endswith('.pkl'):
@@ -88,7 +88,7 @@ def score_resumes(job_description, resume_vectors_file, jd_vectors_file, best_mo
 
     # Sort the resumes based on the scores
     sorted_indices = np.argsort(scores)[::-1]
-    sorted_filenames = [os.path.basename(f) for f in X_resumes[sorted_indices]]
+    sorted_filenames = [os.path.basename(x) for x in np.array(X_resumes)[sorted_indices]]
     sorted_scores = [scores[i] for i in sorted_indices]
 
     # Return the sorted resumes and their scores
