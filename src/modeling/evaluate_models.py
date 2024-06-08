@@ -6,6 +6,19 @@ import numpy as np
 from sklearn.metrics import ndcg_score
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.layers import Layer
+
+# Define the LSTMWrapper class
+class LSTMWrapper(Layer):
+    def __init__(self, units, dropout=0.2, recurrent_dropout=0.2, **kwargs):
+        super(LSTMWrapper, self).__init__(**kwargs)
+        self.units = units
+        self.dropout = dropout
+        self.recurrent_dropout = recurrent_dropout
+        self.lstm = tf.keras.layers.LSTM(units, dropout=dropout, recurrent_dropout=recurrent_dropout, return_sequences=False)
+
+    def call(self, inputs):
+        return self.lstm(tf.expand_dims(inputs, axis=1))
 
 # Preprocess and tokenize the text data
 def preprocess_texts(texts, tokenizer, max_len=500):
@@ -45,7 +58,8 @@ def evaluate_semantic_similarity_model(X_resumes, X_jd):
     return mean_cosine_similarity
 
 def evaluate_siamese_model(X_resumes, X_jd):
-    model = load_model('models/siamese_model.h5')
+    # Use custom_objects to register the custom layer
+    model = load_model('models/siamese_model.h5', custom_objects={'LSTMWrapper': LSTMWrapper})
     # Ensure both inputs have the same number of samples
     min_samples = min(len(X_resumes), len(X_jd))
     X_resumes = X_resumes[:min_samples]
