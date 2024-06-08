@@ -1,7 +1,13 @@
 import os
+import sys
+
+# Add the project root directory to the Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(project_root)
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
-from src.preprocessing.preprocess import preprocess_text # type: ignore
+from src.preprocessing.preprocess import preprocess_text
 
 def vectorize_text(input_dir, output_file):
     documents = []
