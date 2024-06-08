@@ -20,5 +20,5 @@ def save_extracted_text(input_dir, output_dir):
                 text_file.write(text)
 
 if __name__ == "__main__":
-    save_extracted_text('../../data/raw/resumes', '../../data/processed/resumes')
-    save_extracted_text('../../data/raw/job_descriptions', '../../data/processed/job_descriptions')
+    save_extracted_text('data/raw/resumes', 'data/processed/resumes')
+    save_extracted_text('data/raw/job_descriptions', 'data/processed/job_descriptions')
