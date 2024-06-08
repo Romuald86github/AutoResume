@@ -1,7 +1,7 @@
 import os
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
-from tensorflow.keras.models import load_model, save_model
+from tensorflow.keras.models import load_model
 import numpy as np
 from sklearn.metrics import ndcg_score
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     best_model_name = max(model_scores, key=model_scores.get)
     if best_model_name.endswith('.pkl'):
         best_model = joblib.load(f'models/{best_model_name}')
-        save_model(best_model, f'models/best_model.h5')
+        joblib.dump(best_model, 'models/best_model.pkl')
     else:
         best_model = load_model(f'models/{best_model_name}.h5')
-        save_model(best_model, f'models/best_model.h5')
+        joblib.dump(best_model, 'models/best_model.pkl')
