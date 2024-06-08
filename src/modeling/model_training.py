@@ -40,6 +40,9 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
 
+    print(f"X_resumes_pad shape: {X_resumes_pad.shape}")
+    print(f"X_jd_pad shape: {X_jd_pad.shape}")
+
     resume_input = Input(shape=(max_len,), name='resume_input')
     jd_input = Input(shape=(max_len,), name='jd_input')
 
@@ -58,6 +61,7 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
 
     # Create a target tensor with the same length as the input data
     y = np.ones(len(X_resumes_pad))
+    print(f"y shape: {y.shape}")
 
     model.fit([X_resumes_pad, X_jd_pad], y, epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
