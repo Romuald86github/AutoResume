@@ -21,6 +21,14 @@ class LSTMWrapper(Layer):
     def call(self, inputs):
         return self.lstm(tf.expand_dims(inputs, axis=1))
 
+# Define the EuclideanDistanceLayer
+class EuclideanDistanceLayer(Layer):
+    def __init__(self, **kwargs):
+        super(EuclideanDistanceLayer, self).__init__(**kwargs)
+
+    def call(self, inputs):
+        return euclidean_distance(inputs)
+
 # Register the euclidean_distance function
 @register_keras_serializable()
 def euclidean_distance(vects):
