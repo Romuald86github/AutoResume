@@ -55,7 +55,11 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
 
     model = Model(inputs=[resume_input, jd_input], outputs=output)
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit([X_resumes_pad, X_jd_pad], y=np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+
+    # Create a target tensor with the same length as the input data
+    y = np.ones(len(X_resumes_pad))
+
+    model.fit([X_resumes_pad, X_jd_pad], y, epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
