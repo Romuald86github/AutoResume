@@ -83,8 +83,8 @@ def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     model.save('models/ranking_model.h5')
 
 if __name__ == "__main__":
-    _, X_resumes, _ = joblib.load('data/resume_vectors.pkl')
-    _, X_jd, _ = joblib.load('data/job_description_vectors.pkl')
+    X_resumes, _ = joblib.load('data/resume_vectors.pkl')
+    X_jd, _ = joblib.load('data/job_description_vectors.pkl')
 
     train_cosine_similarity_model(X_resumes, X_jd)
     train_semantic_similarity_model(X_resumes, X_jd)
