@@ -32,9 +32,9 @@ def evaluate_cosine_similarity_model(X_resumes, X_jd, vectorizer):
 
 def evaluate_semantic_similarity_model(X_resumes, X_jd):
     model = load_model('models/semantic_similarity_model.h5')
-    resume_embeddings = model.predict(X_resumes)
-    jd_embeddings = model.predict(X_jd)
-    mean_cosine_similarity = np.mean(cosine_similarity(resume_embeddings, jd_embeddings))
+    # Provide both resume and job description inputs to the model
+    predictions = model.predict([X_resumes, X_jd])
+    mean_cosine_similarity = np.mean(predictions)
     
     print(f"Semantic Similarity Model:")
     print(f"Mean Cosine Similarity: {mean_cosine_similarity:.4f}")
@@ -43,8 +43,8 @@ def evaluate_semantic_similarity_model(X_resumes, X_jd):
 
 def evaluate_siamese_model(X_resumes, X_jd):
     model = load_model('models/siamese_model.h5')
-    resume_embeddings = model.predict(X_resumes)
-    jd_embeddings = model.predict(X_jd)
+    resume_embeddings = model.predict([X_resumes, X_jd])
+    jd_embeddings = model.predict([X_jd, X_resumes])
     mean_euclidean_distance = np.mean(np.sqrt(np.sum((resume_embeddings - jd_embeddings) ** 2, axis=1)))
     
     print(f"Siamese Model:")
