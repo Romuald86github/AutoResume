@@ -85,8 +85,8 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     jd_input = Input(shape=(max_len,))
 
     shared_lstm = LSTM(100, dropout=0.2, recurrent_dropout=0.2)
-    resume_embedding = shared_lstm(resume_input)
-    jd_embedding = shared_lstm(jd_input)
+    resume_embedding = shared_lstm(tf.expand_dims(resume_input, axis=1))
+    jd_embedding = shared_lstm(tf.expand_dims(jd_input, axis=1))
 
     distance = Lambda(euclidean_distance)([resume_embedding, jd_embedding])
     model = Model(inputs=[resume_input, jd_input], outputs=distance)
