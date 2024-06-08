@@ -1,0 +1,43 @@
+JOHN DOE
+123 Main St, Anywhere, USA — (123) 456-7890 — john.doe@email.com
+LinkedIn: linkedin.com/in/johndoe — GitHub: github.com/johndoe
+PROFESSIONAL SUMMARY
+Highly skilled Full Stack Developer with over 5 years of experience in Java and Angular development,
+specializing in designing, building, testing, and maintaining web applications. Proficient in an assortment
+of technologies, including Java, Spring Boot, Angular, HTML5, CSS3, and SQL. Exceptional ability to
+work in a team and self-direct. Committed to providing high-quality results with little supervision.
+SKILLS
+•Java and J2EE
+•Spring Boot, Spring MVC, and Hibernate
+•Angular (versions 2+)
+•JavaScript, TypeScript, HTML5, CSS3, and Bootstrap
+•RESTful APIs
+•SQL and NoSQL databases (MySQL, MongoDB)
+•Agile and Scrum
+•Git and GitHub
+•Junit and Mockito
+•Docker
+WORK EXPERIENCE
+Full Stack Java Developer , ABC Company, Inc., Anywhere, USA, June 2018 - Present
+•Developed scalable, robust, and maintainable enterprise-level applications using Java and Spring
+Boot
+•Used Angular for developing dynamic and responsive web front-ends, improving user experience
+by 30
+•Integrated applications with MySQL and MongoDB databases to store and retrieve data efficiently
+•Collaborated in an Agile development team to deliver high-quality software every sprint
+•Created RESTful services and APIs for frontend and third-party applications
+•Wrote unit tests using Junit and Mockito for robust testing of application components
+Software Developer , XYZ Solutions, Anywhere, USA, July 2016 - June 2018
+•Participated in the complete software development life cycle from requirement analysis to deploy-
+ment
+•Implemented business logic using Java and enhanced user interface using Angular
+•Developed and maintained SQL and NoSQL databases, implementing complex queries for business
+needs
+•Utilized Git for version control and collaborated with team members via GitHub
+•Assisted in troubleshooting, software debugging, and system enhancements
+1EDUCATION
+Bachelor of Science in Computer Science , State University, Anywhere, USA, May 2016
+CERTIFICATIONS
+•Oracle Certified Professional, Java SE 8 Programmer
+•Certified Angular Developer
+2

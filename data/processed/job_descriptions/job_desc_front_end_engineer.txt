@@ -1,0 +1,37 @@
+Job Description: Front End Engineer (2 Years of Experience)
+Tech Solutions, San Francisco, CA, USA
+About Us
+At Tech Solutions, we are on a mission to build products that solve complex problems and improve people’s
+lives. We are seeking a talented Front End Engineer to join our dynamic team in San Francisco.
+Job Description
+We are looking for a Front End Engineer with at least 2 years of experience in developing scalable and
+user-friendly web applications. The successful candidate will be proficient in modern JavaScript frameworks
+and libraries, HTML, CSS, and responsive design principles. This role will contribute significantly to the
+creation and implementation of user interfaces for our web applications.
+Responsibilities
+•Develop new user-facing features using modern JavaScript frameworks like React.js, Vue.js, or Angu-
+lar.js.
+•Build reusable code and libraries for future use.
+•Ensure the technical feasibility of UI/UX designs.
+•Optimize application for maximum speed and scalability.
+•Assure that all user input is validated before submitting to back-end services.
+•Collaborate with other team members and stakeholders.
+Requirements
+•2 years of experience as a Front End Developer or similar role.
+•Proficiency in web markup, including HTML5, CSS3.
+•Knowledge of modern JavaScript programming and experience with libraries like jQuery.
+•Familiarity with modern front-end build pipelines and tools.
+•Experience with popular front-end frameworks (such as React, Vue, or Angular).
+•Familiarity with code versioning tools such as Git.
+•Degree in Computer Science, Engineering, or a related field.
+1Benefits
+•Competitive salary package.
+•Health, dental, and vision insurance.
+•Retirement savings plan.
+•Professional development opportunities.
+•Flexible work hours.
+Tech Solutions is proud to be an equal opportunity employer. We celebrate diversity and are committed
+to creating an inclusive environment for all employees.
+How to Apply
+To apply, please submit your resume and a brief explanation of your relevant experience to hiring@techsolutions.com .
+2

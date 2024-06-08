@@ -1,0 +1,45 @@
+Job Description: Java Developer (3 Years of Experience)
+Tech Solutions, San Francisco, CA, USA
+About Us
+At Tech Solutions, we believe in the power of technology to solve complex problems. We are a dynamic,
+forward-thinking tech company specializing in custom software solutions for various industries. We are
+seeking a talented and experienced Java Developer to join our team.
+Job Description
+We are seeking a skilled Java Developer with at least 3 years of experience in building high-performing, scal-
+able, enterprise-grade applications. You will be part of a talented software team that works on mission-critical
+applications. Your roles and responsibilities will include managing Java/Java EE application development
+while providing expertise in the full software development lifecycle.
+Responsibilities
+•Designing, implementing, and maintaining Java applications that are often high-volume and low-
+latency, required for mission-critical systems.
+•Delivering high availability and performance.
+•Contributing to all phases of the development lifecycle.
+•Writing well-designed, efficient, and testable code.
+•Conducting software analysis, programming, testing, and debugging.
+•Ensuring designs comply with specifications.
+•Preparing and producing releases of software components.
+•Supporting continuous improvement by investigating alternatives and technologies and presenting these
+for architectural review.
+Requirements
+•BS/MS degree in Computer Science, Engineering, or a related subject.
+•Proven hands-on Software Development experience.
+•Proven working experience in Java development.
+•Hands-on experience in designing and developing applications using Java EE platforms.
+•Object-Oriented Analysis and design using common design patterns.
+•Profound insight of Java and JEE internals (Classloading, Memory Management, Transaction man-
+agement, etc.)
+1•Excellent knowledge of Relational Databases, SQL, and ORM technologies (JPA2, Hibernate).
+•Experience in developing web applications using at least one popular web framework (JSF, Wicket,
+GWT, Spring MVC).
+•Experience with test-driven development.
+Benefits
+•Competitive salary package.
+•Health, dental, and vision insurance.
+•Retirement savings plan.
+•Professional development opportunities.
+•Flexible work hours.
+Tech Solutions is proud to be an equal opportunity employer. We celebrate diversity and are committed
+to creating an inclusive environment for all employees.
+How to Apply
+To apply, please submit your resume and a brief explanation of your relevant experience to hiring@techsolutions.com .
+2

@@ -1,0 +1,30 @@
+Barry Allen
+Front-End DeveloperGoogle HQ, Mountain View, CA, USA
+♂¶obile-alt(123) 456-7890
+/envel⌢peallthe.stars@google.com
+/linkedin-inbwayne
+/githubbwayne
+Objective
+Seeking a challenging role as a Front-End Developer where I can leverage my knowledge of UI/UX
+design and modern web technologies to create intuitive and engaging user interfaces.
+Education
+2018 – 2022 B.Tech, Computer Science and Engineering ,Indian Institute of Technology
+Delhi , New Delhi, India
+Overall GPA: 9.5/10
+Skills
+JavaScript (ES6+), TypeScript, HTML5, CSS3, Python, React, Redux, Angular,
+Vue.js, Node.js, Express.js, D3.js, Git, Docker, Webpack, Babel, Google Cloud
+Platform, Firebase, RESTful APIs, GraphQL, Agile Development, Test-Driven
+Development, Responsive Design, UI/UX
+Experience
+June 2022 –
+PresentSoftware Engineer (Front-End) ,Google , Mountain View, CA, USA
+Developing intuitive and engaging user interfaces using React and Redux. Working closely
+with UX designers to implement responsive and accessible web design. Participating in
+agile development processes, including sprint planning and code reviews. Collaborating with
+back-end developers to integrate RESTful APIs and ensure seamless data flow.
+Projects
+2022 Personal Expense Tracker
+Developed a personal expense tracker application using React, Redux, and Firebase. Imple-
+mented user authentication using Firebase Auth and data storage using Firestore. Utilized
+D3.js for data visualization to provide users with insights into their spending patterns.
