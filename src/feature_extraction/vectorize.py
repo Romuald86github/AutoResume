@@ -1,7 +1,7 @@
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
-from src.preprocess.preprocess import preprocess_text # type: ignore
+from src.preprocessing.preprocess import preprocess_text # type: ignore
 
 def vectorize_text(input_dir, output_file):
     documents = []
@@ -19,5 +19,5 @@ def vectorize_text(input_dir, output_file):
         pickle.dump((vectorizer, vectors), file)
 
 if __name__ == "__main__":
-    vectorize_text('../../data/processed/preprocessed_resumes', 'resume_vectors.pkl')
-    vectorize_text('../../data/processed/preprocessed_job_descriptions', 'jd_vectors.pkl')
+    vectorize_text('data/processed/preprocessed_resumes', 'data/resume_vectors.pkl')
+    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/job_description_vectors.pkl')
