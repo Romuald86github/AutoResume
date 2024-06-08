@@ -1,7 +1,7 @@
 import os
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model, save_model
 import numpy as np
 from sklearn.metrics import ndcg_score
 
@@ -67,16 +67,14 @@ if __name__ == "__main__":
 
     # Select the best model based on the evaluation metrics
     best_model_name = max(model_scores, key=model_scores.get)
-    if best_model_name.endswith('.pkl'):
-        best_model = joblib.load(f'models/{best_model_name}')
-    else:
-        best_model = load_model(f'models/{best_model_name}.h5')
-
+    
     # Create the 'models/' directory if it doesn't exist
     os.makedirs('models', exist_ok=True)
-
+    
     # Save the best model
     if best_model_name.endswith('.pkl'):
+        best_model = joblib.load(f'models/{best_model_name}')
         joblib.dump(best_model, 'models/best_model.pkl')
     else:
+        best_model = load_model(f'models/{best_model_name}.h5')
         best_model.save('models/best_model.h5')
