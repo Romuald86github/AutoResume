@@ -11,17 +11,17 @@ from tensorflow.keras import backend as K # type: ignore
 from tensorflow.keras.optimizers import Adam # type: ignore
 from tensorflow.keras.losses import MeanSquaredError # type: ignore
 
-def train_cosine_similarity_model(X_resumes, X_jd):
+def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd):
     # Compute cosine similarity matrix
-    similarity_matrix = cosine_similarity(X_resumes, X_jd)
+    similarity_matrix = cosine_similarity(vectorizer_resumes.transform(X_resumes), vectorizer_jd.transform(X_jd))
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
 
 def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
+    tokenizer.fit_on_texts(X_resumes + X_jd)
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
@@ -36,10 +36,10 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
 
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
+    tokenizer.fit_on_texts(X_resumes + X_jd)
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
@@ -63,10 +63,10 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
 
 def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
+    tokenizer.fit_on_texts(X_resumes + X_jd)
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     X_resumes, vectorizer_resumes = joblib.load('data/resume_vectors.pkl')
     X_jd, vectorizer_jd = joblib.load('data/job_description_vectors.pkl')
 
-    train_cosine_similarity_model(vectorizer_resumes.transform(X_resumes), vectorizer_jd.transform(X_jd))
+    train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd)
     train_semantic_similarity_model(X_resumes, X_jd)
     train_siamese_model(X_resumes, X_jd)
     train_ranking_model(X_resumes, X_jd)
