@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # Save the best model
     if best_model_name.endswith('.pkl'):
         best_model = joblib.load(f'models/{best_model_name}')
-        joblib.dump(best_model, 'models/best_model.pkl')
+        joblib.dump(best_model, os.path.join('models', 'best_model.pkl'))
     else:
         best_model = load_model(f'models/{best_model_name}.h5')
-        best_model.save('models/best_model.h5')
+        best_model.save(os.path.join('models', 'best_model.h5'))
