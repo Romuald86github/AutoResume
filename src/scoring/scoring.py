@@ -1,7 +1,8 @@
 import os
 import joblib
-import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 from tensorflow.keras.models import load_model
+import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Layer
@@ -21,6 +22,13 @@ class LSTMWrapper(Layer):
     def call(self, inputs):
         return self.lstm(tf.expand_dims(inputs, axis=1))
 
+# Register the euclidean_distance function
+@register_keras_serializable()
+def euclidean_distance(vects):
+    x, y = vects
+    sum_square = tf.math.reduce_sum(tf.math.square(x - y), axis=1, keepdims=True)
+    return tf.math.sqrt(tf.math.maximum(sum_square, tf.keras.backend.epsilon()))
+
 # Define the EuclideanDistanceLayer
 class EuclideanDistanceLayer(Layer):
     def __init__(self, **kwargs):
@@ -29,20 +37,13 @@ class EuclideanDistanceLayer(Layer):
     def call(self, inputs):
         return euclidean_distance(inputs)
 
-# Register the euclidean_distance function
-@register_keras_serializable()
-def euclidean_distance(vects):
-    x, y = vects
-    sum_square = tf.math.reduce_sum(tf.math.square(x - y), axis=1, keepdims=True)
-    return tf.math.sqrt(tf.math.maximum(sum_square, tf.keras.backend.epsilon()))
-
 # Register the mse function
 @register_keras_serializable()
 def mse(y_true, y_pred):
     return MeanSquaredError()(y_true, y_pred)
 
 # Preprocess and tokenize the text data
-def preprocess_text(texts, tokenizer, max_len=500):
+def preprocess_texts(texts, tokenizer, max_len=500):
     sequences = tokenizer.texts_to_sequences(texts)
     padded_sequences = pad_sequences(sequences, maxlen=max_len)
     return padded_sequences
@@ -60,7 +61,7 @@ def score_resumes(job_description, resume_vectors_file, jd_vectors_file, best_mo
     tokenizer.fit_on_texts(X_resumes + X_jd)
 
     # Preprocess the job description
-    preprocessed_jd = preprocess_text([job_description], tokenizer)
+    preprocessed_jd = preprocess_texts([job_description], tokenizer)
 
     # Load the best model
     if best_model_path.endswith('.pkl'):
@@ -78,10 +79,10 @@ def score_resumes(job_description, resume_vectors_file, jd_vectors_file, best_mo
         custom_objects = {'LSTMWrapper': LSTMWrapper, 'EuclideanDistanceLayer': EuclideanDistanceLayer, 'mse': mse}
         best_model = load_model(best_model_path, custom_objects=custom_objects)
         if best_model_path == 'models/best_model.h5':
-            X_resumes_preprocessed = preprocess_text(X_resumes, tokenizer)
+            X_resumes_preprocessed = preprocess_texts(X_resumes, tokenizer)
             scores = best_model.predict([X_resumes_preprocessed, preprocessed_jd])
         else:
-            X_resumes_preprocessed = preprocess_text(X_resumes, tokenizer)
+            X_resumes_preprocessed = preprocess_texts(X_resumes, tokenizer)
             resume_embeddings = best_model.predict([X_resumes_preprocessed, preprocessed_jd])
             jd_embeddings = best_model.predict([preprocessed_jd, X_resumes_preprocessed])
             scores = -np.mean(np.sqrt(np.sum((resume_embeddings - jd_embeddings) ** 2, axis=1)), axis=0)
