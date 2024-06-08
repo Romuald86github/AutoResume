@@ -8,6 +8,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Layer
 import tensorflow as tf
+from tensorflow.keras.saving import register_keras_serializable
 
 # Define the LSTMWrapper class
 class LSTMWrapper(Layer):
@@ -20,6 +21,21 @@ class LSTMWrapper(Layer):
 
     def call(self, inputs):
         return self.lstm(tf.expand_dims(inputs, axis=1))
+
+# Register the euclidean_distance function
+@register_keras_serializable()
+def euclidean_distance(vects):
+    x, y = vects
+    sum_square = tf.math.reduce_sum(tf.math.square(x - y), axis=1, keepdims=True)
+    return tf.math.sqrt(tf.math.maximum(sum_square, tf.keras.backend.epsilon()))
+
+# Define the EuclideanDistanceLayer
+class EuclideanDistanceLayer(Layer):
+    def __init__(self, **kwargs):
+        super(EuclideanDistanceLayer, self).__init__(**kwargs)
+
+    def call(self, inputs):
+        return euclidean_distance(inputs)
 
 # Preprocess and tokenize the text data
 def preprocess_texts(texts, tokenizer, max_len=500):
@@ -60,7 +76,7 @@ def evaluate_semantic_similarity_model(X_resumes, X_jd):
 
 def evaluate_siamese_model(X_resumes, X_jd):
     # Use custom_objects to register the custom layer
-    model = load_model('models/siamese_model.h5', custom_objects={'LSTMWrapper': LSTMWrapper})
+    model = load_model('models/siamese_model.h5', custom_objects={'LSTMWrapper': LSTMWrapper, 'EuclideanDistanceLayer': EuclideanDistanceLayer})
     # Ensure both inputs have the same number of samples
     min_samples = min(len(X_resumes), len(X_jd))
     X_resumes = X_resumes[:min_samples]
@@ -120,7 +136,7 @@ if __name__ == "__main__":
         best_model = joblib.load(f'models/{best_model_name}')
         joblib.dump(best_model, f'{best_model_path}.pkl')
     else:
-        best_model = load_model(f'models/{best_model_name}')
+        best_model = load_model(f'models/{best_model_name}', custom_objects={'LSTMWrapper': LSTMWrapper, 'EuclideanDistanceLayer': EuclideanDistanceLayer})
         best_model.save(f'{best_model_path}.h5')
 
     print(f"The best model is {best_model_name} and has been saved as {best_model_path}.")
