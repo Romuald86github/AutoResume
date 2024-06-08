@@ -3,18 +3,20 @@ import joblib
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import tensorflow as tf
-from tensorflow.keras.models import Sequential, Model # type: ignore
-from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D, Input, Lambda # type: ignore
-from tensorflow.keras.preprocessing.text import Tokenizer # type: ignore
-from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
-from tensorflow.keras import backend as K # type: ignore
-from tensorflow.keras.optimizers import Adam # type: ignore
-from tensorflow.keras.losses import MeanSquaredError # type: ignore
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D, Input, Lambda
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras import backend as K
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import MeanSquaredError
 
 def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd):
-    # Compute cosine similarity matrix
+    # Transform the raw text data using the vectorizers
     X_resumes_transformed = vectorizer_resumes.transform(X_resumes)
     X_jd_transformed = vectorizer_jd.transform(X_jd)
+    
+    # Compute cosine similarity matrix
     similarity_matrix = cosine_similarity(X_resumes_transformed.toarray(), X_jd_transformed.toarray())
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
 
@@ -30,6 +32,7 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
 
     model = Sequential()
     model.add(Embedding(max_words, 128, input_length=max_len))
+    model.add(SpatialDropout1D(0.2))
     model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -85,8 +88,14 @@ def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     model.save('models/ranking_model.h5')
 
 if __name__ == "__main__":
-    X_resumes, vectorizer_resumes = joblib.load('data/resume_vectors.pkl')
-    X_jd, vectorizer_jd = joblib.load('data/job_description_vectors.pkl')
+    resumes_data, jd_data = joblib.load('data/resume_vectors.pkl')
+    jd_data, _ = joblib.load('data/job_description_vectors.pkl')
+
+    X_resumes = resumes_data['raw_texts']
+    X_jd = jd_data['raw_texts']
+
+    vectorizer_resumes = resumes_data['vectorizer']
+    vectorizer_jd = jd_data['vectorizer']
 
     train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd)
     train_semantic_similarity_model(X_resumes, X_jd)
