@@ -13,9 +13,15 @@ def preprocess_texts(texts, tokenizer, max_len=500):
     padded_sequences = pad_sequences(sequences, maxlen=max_len)
     return padded_sequences
 
-def evaluate_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd):
-    X_resumes_transformed = vectorizer_resumes.transform(X_resumes)
-    X_jd_transformed = vectorizer_jd.transform(X_jd)
+def evaluate_cosine_similarity_model(X_resumes, X_jd, vectorizer):
+    X_resumes_transformed = vectorizer.transform(X_resumes)
+    X_jd_transformed = vectorizer.transform(X_jd)
+
+    # Align the feature dimensions
+    min_features = min(X_resumes_transformed.shape[1], X_jd_transformed.shape[1])
+    X_resumes_transformed = X_resumes_transformed[:, :min_features]
+    X_jd_transformed = X_jd_transformed[:, :min_features]
+
     similarity_matrix = cosine_similarity(X_resumes_transformed.toarray(), X_jd_transformed.toarray())
     mean_cosine_similarity = np.mean(similarity_matrix.diagonal())
     
@@ -63,8 +69,7 @@ if __name__ == "__main__":
     X_resumes = resumes_data['raw_texts']
     X_jd = jd_data['raw_texts']
 
-    vectorizer_resumes = resumes_data['vectorizer']
-    vectorizer_jd = jd_data['vectorizer']
+    vectorizer = resumes_data['vectorizer']
 
     # Use the same tokenizer for semantic and ranking models to ensure consistency
     tokenizer = Tokenizer(num_words=5000)
@@ -75,7 +80,7 @@ if __name__ == "__main__":
     X_jd_preprocessed = preprocess_texts(X_jd, tokenizer)
 
     model_scores = {
-        'cosine_similarity_model.pkl': evaluate_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd),
+        'cosine_similarity_model.pkl': evaluate_cosine_similarity_model(X_resumes, X_jd, vectorizer),
         'semantic_similarity_model.h5': evaluate_semantic_similarity_model(X_resumes_preprocessed, X_jd_preprocessed),
         'siamese_model.h5': evaluate_siamese_model(X_resumes_preprocessed, X_jd_preprocessed),
         'ranking_model.h5': evaluate_ranking_model(X_resumes_preprocessed, X_jd_preprocessed)
