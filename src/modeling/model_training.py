@@ -68,18 +68,6 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     model.save('models/semantic_similarity_model.h5')
 
 from tensorflow.keras.layers import Layer
-# siamse model
-class LSTMWrapper(Layer):
-    def __init__(self, units, dropout=0.2, recurrent_dropout=0.2, **kwargs):
-        super(LSTMWrapper, self).__init__(**kwargs)
-        self.units = units
-        self.dropout = dropout
-        self.recurrent_dropout = recurrent_dropout
-        self.lstm = LSTM(units, dropout=dropout, recurrent_dropout=recurrent_dropout, return_sequences=False)
-
-    def call(self, inputs):
-        return self.lstm(tf.expand_dims(inputs, axis=1))
-
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
     tokenizer.fit_on_texts(X_resumes + X_jd)
@@ -90,9 +78,21 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
 
-    def euclidean_distance(vects):
-        x, y = vects
-        return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
+    # Ensure the input tensors have the same number of samples
+    min_samples = min(len(X_resumes_pad), len(X_jd_pad))
+    X_resumes_pad = X_resumes_pad[:min_samples]
+    X_jd_pad = X_jd_pad[:min_samples]
+
+    class LSTMWrapper(Layer):
+        def __init__(self, units, dropout=0.2, recurrent_dropout=0.2, **kwargs):
+            super(LSTMWrapper, self).__init__(**kwargs)
+            self.units = units
+            self.dropout = dropout
+            self.recurrent_dropout = recurrent_dropout
+            self.lstm = LSTM(units, dropout=dropout, recurrent_dropout=recurrent_dropout, return_sequences=False)
+
+        def call(self, inputs):
+            return self.lstm(tf.expand_dims(inputs, axis=1))
 
     resume_input = Input(shape=(max_len,))
     jd_input = Input(shape=(max_len,))
@@ -104,7 +104,11 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     distance = Lambda(euclidean_distance)([resume_embedding, jd_embedding])
     model = Model(inputs=[resume_input, jd_input], outputs=distance)
     model.compile(loss=MeanSquaredError(), optimizer=Adam())
-    model.fit([X_resumes_pad, X_jd_pad], np.zeros(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+
+    # Create a target tensor with the same length as the input data
+    y = np.zeros(len(X_resumes_pad))
+
+    model.fit([X_resumes_pad, X_jd_pad], y, epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/siamese_model.h5')
 def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
