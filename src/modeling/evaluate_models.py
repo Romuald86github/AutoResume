@@ -1,7 +1,7 @@
 import os
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
-from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.models import load_model
 import numpy as np
 from sklearn.metrics import ndcg_score
 
@@ -47,8 +47,16 @@ def evaluate_ranking_model(X_resumes, X_jd):
     return ndcg
 
 if __name__ == "__main__":
-    _, X_resumes, _ = joblib.load('../../data/processed/resume_vectors.pkl')
-    _, X_jd, _ = joblib.load('../../data/processed/jd_vectors.pkl')
+    resumes_data = joblib.load('data/processed/resume_vectors.pkl')
+    jd_data = joblib.load('data/processed/jd_vectors.pkl')
+
+    X_resumes = resumes_data['raw_texts']
+    X_jd = jd_data['raw_texts']
+
+    print(f"resumes_data: {resumes_data}")
+    print(f"jd_data: {jd_data}")
+    print(f"X_resumes: {X_resumes}")
+    print(f"X_jd: {X_jd}")
 
     model_scores = {
         'cosine_similarity': evaluate_cosine_similarity_model(X_resumes, X_jd),
@@ -59,4 +67,7 @@ if __name__ == "__main__":
 
     # Select the best model based on the evaluation metrics
     best_model_name = max(model_scores, key=model_scores.get)
-    best_model = joblib.load(f'models/{best_model_name}.pkl') if best_model_name.endswith('.pkl') else load_model(f'models/{best_model_name}.h5')
+    if best_model_name.endswith('.pkl'):
+        best_model = joblib.load(f'models/{best_model_name}')
+    else:
+        best_model = load_model(f'models/{best_model_name}.h5')
