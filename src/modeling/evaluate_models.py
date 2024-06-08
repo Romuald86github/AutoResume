@@ -72,9 +72,10 @@ if __name__ == "__main__":
     os.makedirs('models', exist_ok=True)
     
     # Save the best model
+    best_model_path = os.path.join('models', 'best_model')
     if best_model_name.endswith('.pkl'):
         best_model = joblib.load(f'models/{best_model_name}')
-        joblib.dump(best_model, os.path.join('models', 'best_model.pkl'))
+        joblib.dump(best_model, f'{best_model_path}.pkl')
     else:
         best_model = load_model(f'models/{best_model_name}.h5')
-        best_model.save(os.path.join('models', 'best_model.h5'))
+        best_model.save(f'{best_model_path}.h5')
