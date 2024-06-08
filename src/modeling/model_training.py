@@ -15,7 +15,12 @@ def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorize
     # Transform the raw text data using the vectorizers
     X_resumes_transformed = vectorizer_resumes.transform(X_resumes)
     X_jd_transformed = vectorizer_jd.transform(X_jd)
-    
+
+    # Align the feature dimensions
+    min_features = min(X_resumes_transformed.shape[1], X_jd_transformed.shape[1])
+    X_resumes_transformed = X_resumes_transformed[:, :min_features]
+    X_jd_transformed = X_jd_transformed[:, :min_features]
+
     # Compute cosine similarity matrix
     similarity_matrix = cosine_similarity(X_resumes_transformed.toarray(), X_jd_transformed.toarray())
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
@@ -36,7 +41,7 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_resumes_pad, np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+    model.fit([X_resumes_pad, X_jd_pad], np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
 
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
