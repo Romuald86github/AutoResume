@@ -48,7 +48,7 @@ def evaluate_ranking_model(X_resumes, X_jd):
 
 if __name__ == "__main__":
     resumes_data = joblib.load('data/resume_vectors.pkl')
-    jd_data = joblib.load('data/jd_vectors.pkl')
+    jd_data = joblib.load('data/job_description_vectors.pkl')
 
     X_resumes = resumes_data['raw_texts']
     X_jd = jd_data['raw_texts']
