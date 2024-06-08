@@ -40,11 +40,20 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
 
-    model = Sequential()
-    model.add(Embedding(max_words, 128, input_length=max_len))
-    model.add(SpatialDropout1D(0.2))
-    model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
-    model.add(Dense(1, activation='sigmoid'))
+    resume_input = Input(shape=(max_len,), name='resume_input')
+    jd_input = Input(shape=(max_len,), name='jd_input')
+
+    embedding = Embedding(max_words, 128)
+    resume_embedding = embedding(resume_input)
+    jd_embedding = embedding(jd_input)
+
+    merged = tf.keras.layers.concatenate([resume_embedding, jd_embedding], axis=-1)
+
+    x = SpatialDropout1D(0.2)(merged)
+    x = LSTM(100, dropout=0.2, recurrent_dropout=0.2)(x)
+    output = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs=[resume_input, jd_input], outputs=output)
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit([X_resumes_pad, X_jd_pad], y=np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
