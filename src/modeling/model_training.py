@@ -36,7 +36,7 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
     model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit([X_resumes_pad, X_jd_pad], np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+    model.fit(X_resumes_pad, np.ones(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/semantic_similarity_model.h5')
 
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
@@ -84,17 +84,18 @@ def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     model.compile(loss='mse', optimizer='adam')
 
     # Train the ranking model
-    model.fit([X_resumes_pad, X_jd_pad], np.arange(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
+    model.fit(X_resumes_pad, np.arange(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
     model.save('models/ranking_model.h5')
 
 if __name__ == "__main__":
-    resumes_data, jd_data = joblib.load('data/resume_vectors.pkl')
-    jd_data, _ = joblib.load('data/job_description_vectors.pkl')
+    resumes_data = joblib.load('data/resume_vectors.pkl')
+    jd_data = joblib.load('data/job_description_vectors.pkl')
 
+    # Assuming resumes_data and jd_data contain 'raw_texts' and 'vectorizer'
     X_resumes = resumes_data['raw_texts']
-    X_jd = jd_data['raw_texts']
-
     vectorizer_resumes = resumes_data['vectorizer']
+
+    X_jd = jd_data['raw_texts']
     vectorizer_jd = jd_data['vectorizer']
 
     train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd)
