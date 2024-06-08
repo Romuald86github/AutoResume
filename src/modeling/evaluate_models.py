@@ -69,7 +69,14 @@ if __name__ == "__main__":
     best_model_name = max(model_scores, key=model_scores.get)
     if best_model_name.endswith('.pkl'):
         best_model = joblib.load(f'models/{best_model_name}')
-        joblib.dump(best_model, 'models/best_model.pkl')
     else:
         best_model = load_model(f'models/{best_model_name}.h5')
+
+    # Create the 'models/' directory if it doesn't exist
+    os.makedirs('models', exist_ok=True)
+
+    # Save the best model
+    if best_model_name.endswith('.pkl'):
         joblib.dump(best_model, 'models/best_model.pkl')
+    else:
+        best_model.save('models/best_model.h5')
