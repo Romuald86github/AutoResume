@@ -6,8 +6,6 @@ nltk.download('all')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-
-
 def remove_punctuation(text):
     # Create a translation table to remove punctuation
     translator = str.maketrans('', '', string.punctuation)
@@ -56,5 +54,5 @@ def preprocess_files(input_dir, output_dir):
                 output_file.write(preprocessed_text)
 
 if __name__ == "__main__":
-    preprocess_files('../../data/processed/resumes', '../../data/processed/preprocessed_resumes')
-    preprocess_files('../../data/processed/job_descriptions', '../../data/processed/preprocessed_job_descriptions')
+    preprocess_files('data/processed/resumes', 'data/processed/preprocessed_resumes')
+    preprocess_files('data/processed/job_descriptions', 'data/processed/preprocessed_job_descriptions')
