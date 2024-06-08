@@ -13,15 +13,15 @@ from tensorflow.keras.losses import MeanSquaredError # type: ignore
 
 def train_cosine_similarity_model(X_resumes, X_jd):
     # Compute cosine similarity matrix
-    similarity_matrix = cosine_similarity(X_resumes, X_jd)
+    similarity_matrix = cosine_similarity(X_resumes.toarray(), X_jd.toarray())
     joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
 
 def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
+    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
@@ -36,10 +36,10 @@ def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500
 
 def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
+    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
@@ -63,10 +63,10 @@ def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
 
 def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
+    tokenizer.fit_on_texts(X_resumes.tolist() + X_jd.tolist())
 
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
+    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes.tolist())
+    X_jd_seq = tokenizer.texts_to_sequences(X_jd.tolist())
 
     X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
     X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
