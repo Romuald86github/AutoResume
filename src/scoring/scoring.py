@@ -88,7 +88,7 @@ def score_resumes(job_description, resume_vectors_file, jd_vectors_file, best_mo
 
 if __name__ == "__main__":
     job_description = "Software Engineer with experience in Python and machine learning."
-    scores = score_resumes(job_description, '../../data/processed/resume_vectors.pkl', '../../data/processed/jd_vectors.pkl', 'models/best_model.h5')
+    scores = score_resumes(job_description, 'data/resume_vectors.pkl', 'data/job_description_vectors.pkl', 'models/best_model.h5')
 
     for filename, score in scores.items():
         print(f"{filename}: {score:.4f}")
