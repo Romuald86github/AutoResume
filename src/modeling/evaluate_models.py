@@ -76,7 +76,7 @@ def evaluate_semantic_similarity_model(X_resumes, X_jd):
     mean_cosine_similarity = np.mean(predictions)
     
     print(f"Semantic Similarity Model:")
-    print(f"Mean Cosine Similarity: {mean_cosine_similarity:.4f}")
+    print(f"Mean Semantic Similarity: {mean_cosine_similarity:.4f}")
     
     return mean_cosine_similarity
 
