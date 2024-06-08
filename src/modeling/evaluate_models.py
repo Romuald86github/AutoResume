@@ -7,6 +7,7 @@ from sklearn.metrics import ndcg_score
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Layer
+import tensorflow as tf
 
 # Define the LSTMWrapper class
 class LSTMWrapper(Layer):
