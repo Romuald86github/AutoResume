@@ -8,25 +8,32 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
-def train_models(X, labels):
+def train_models(resume_vectors, jd_vectors, labels):
+    # Ensure the shapes of resume_vectors and jd_vectors are the same
+    max_length = max(resume_vectors.shape[0], jd_vectors.shape[0])
+    if resume_vectors.shape[0] < max_length:
+        resume_vectors = np.concatenate([resume_vectors, resume_vectors[:max_length - resume_vectors.shape[0]]], axis=0)
+    elif jd_vectors.shape[0] < max_length:
+        jd_vectors = np.concatenate([jd_vectors, jd_vectors[:max_length - jd_vectors.shape[0]]], axis=0)
+
     # Train a logistic regression model
     logistic_model = LogisticRegression()
-    logistic_model.fit(X, labels)
-    y_pred = logistic_model.predict(X)
+    logistic_model.fit(resume_vectors, labels)
+    y_pred = logistic_model.predict(resume_vectors)
     logistic_mse = mean_squared_error(labels, y_pred)
     print(f"Logistic Regression MSE: {logistic_mse:.4f}")
 
     # Train an SVM model
     svm_model = SVC(kernel='rbf', probability=True)
-    svm_model.fit(X, labels)
-    y_pred = svm_model.predict(X)
+    svm_model.fit(resume_vectors, labels)
+    y_pred = svm_model.predict(resume_vectors)
     svm_mse = mean_squared_error(labels, y_pred)
     print(f"SVM MSE: {svm_mse:.4f}")
 
     # Train a random forest model
     rf_model = RandomForestRegressor()
-    rf_model.fit(X, labels)
-    y_pred = rf_model.predict(X)
+    rf_model.fit(resume_vectors, labels)
+    y_pred = rf_model.predict(resume_vectors)
     rf_mse = mean_squared_error(labels, y_pred)
     print(f"Random Forest MSE: {rf_mse:.4f}")
 
@@ -41,20 +48,11 @@ if __name__ == "__main__":
         resume_vectors = resume_data['resume_vectors']
         jd_vectors = jd_data['jd_vectors']
 
-        # Check if the vectors are 0-dimensional arrays
-        if resume_vectors.ndim == 0:
-            resume_vectors = np.expand_dims(resume_vectors, axis=0)
-        if jd_vectors.ndim == 0:
-            jd_vectors = np.expand_dims(jd_vectors, axis=0)
-
-        # Concatenate the resume and job description vectors
-        X = np.concatenate([resume_vectors, jd_vectors], axis=0)
-
         # Compute the cosine similarity between each resume and each job description
-        similarity_matrix = cosine_similarity(X)
+        similarity_matrix = cosine_similarity(resume_vectors, jd_vectors)
         labels = np.max(similarity_matrix, axis=1)
 
-        logistic_model, svm_model, rf_model = train_models(X, labels)
+        logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
 
         # Save the trained models
         joblib.dump(logistic_model, 'models/logistic_model.pkl')
