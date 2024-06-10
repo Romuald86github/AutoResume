@@ -50,8 +50,13 @@ if __name__ == "__main__":
             # Load the data from the downloaded file
             data = joblib.load(io.BytesIO(response.content))
 
+            print("Data keys:", data.keys())
+
             resume_vectors = data['resume_vectors']
             jd_vectors = data['jd_vectors']
+
+            print("resume_vectors shape:", resume_vectors.shape)
+            print("jd_vectors shape:", jd_vectors.shape)
 
             # Compute the cosine similarity between each resume and each job description
             similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
