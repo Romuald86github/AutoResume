@@ -1,3 +1,7 @@
+import os
+import joblib
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 def vectorize_text(input_dir, output_file):
     resume_texts = []
     resume_filenames = []
@@ -10,11 +14,11 @@ def vectorize_text(input_dir, output_file):
             with open(file_path, 'r') as file:
                 text = file.read().strip()
 
-            if text:  # Check if the text is not empty
-                if filename.startswith("resume_"):
+            if text:
+                if "resume" in filename.lower():
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif filename.startswith("job_"):
+                elif "job" in filename.lower():
                     jd_texts.append(text)
                     jd_filenames.append(filename)
 
@@ -38,3 +42,7 @@ def vectorize_text(input_dir, output_file):
             }, file)
     else:
         print("No valid text files found in the input directories.")
+
+if __name__ == "__main__":
+    vectorize_text('data/processed/preprocessed_resumes', 'data/vectors.pkl')
+    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/vectors.pkl')
