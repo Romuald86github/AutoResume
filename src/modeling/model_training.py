@@ -11,9 +11,9 @@ from sklearn.metrics import mean_squared_error
 def train_models(resume_vectors, jd_vectors, labels):
     # Augment the data to match the shapes
     if resume_vectors.shape[0] < jd_vectors.shape[0]:
-        resume_vectors = np.concatenate([resume_vectors, resume_vectors[:jd_vectors.shape[0] - resume_vectors.shape[0]]], axis=0)
+        resume_vectors = np.repeat(resume_vectors, jd_vectors.shape[0] // resume_vectors.shape[0] + 1, axis=0)[:jd_vectors.shape[0]]
     elif jd_vectors.shape[0] < resume_vectors.shape[0]:
-        jd_vectors = np.concatenate([jd_vectors, jd_vectors[:resume_vectors.shape[0] - jd_vectors.shape[0]]], axis=0)
+        jd_vectors = np.repeat(jd_vectors, resume_vectors.shape[0] // jd_vectors.shape[0] + 1, axis=0)[:resume_vectors.shape[0]]
 
     # Train a logistic regression model
     logistic_model = LogisticRegression()
