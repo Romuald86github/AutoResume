@@ -14,7 +14,7 @@ def vectorize_text(input_dir, output_file):
                 if filename.startswith("resume_"):
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif filename.startswith("jd_"):
+                elif filename.startswith("job_"):
                     jd_texts.append(text)
                     jd_filenames.append(filename)
 
