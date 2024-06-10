@@ -1,13 +1,10 @@
-
-
 import os
 import joblib
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import mean_squared_error, cosine_similarity
 
 def train_models(resume_vectors, jd_vectors, labels):
     # Split the data into training and testing sets
@@ -45,17 +42,26 @@ def train_models(resume_vectors, jd_vectors, labels):
     return logistic_model, svm_model, rf_model
 
 if __name__ == "__main__":
-    data = joblib.load('data/vectors.pkl')
-    resume_vectors = data['resume_vectors']
-    jd_vectors = data['jd_vectors']
+    try:
+        data = joblib.load('data/vectors.pkl')
+        resume_vectors = data.get('resume_vectors', None)
+        jd_vectors = data.get('jd_vectors', None)
 
-    # Compute the cosine similarity between each resume and each job description
-    similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
+        if resume_vectors is None or jd_vectors is None:
+            print("Error: 'resume_vectors' or 'jd_vectors' not found in the data file.")
+            return
 
-    # Find the highest similarity score for each job description and use it as the label
-    labels = np.max(similarity_matrix, axis=0)
+        # Compute the cosine similarity between each resume and each job description
+        similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
 
-    logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
-    joblib.dump(logistic_model, 'models/logistic_model.pkl')
-    joblib.dump(svm_model, 'models/svm_model.pkl')
-    joblib.dump(rf_model, 'models/rf_model.pkl')
+        # Find the highest similarity score for each job description and use it as the label
+        labels = np.max(similarity_matrix, axis=0)
+
+        logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
+        joblib.dump(logistic_model, 'models/logistic_model.pkl')
+        joblib.dump(svm_model, 'models/svm_model.pkl')
+        joblib.dump(rf_model, 'models/rf_model.pkl')
+    except FileNotFoundError:
+        print("Error: 'data/vectors.pkl' file not found.")
+    except Exception as e:
+        print(f"Error: {e}")
