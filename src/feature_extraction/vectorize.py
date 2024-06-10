@@ -34,6 +34,7 @@ def vectorize_text(input_dir, output_file):
         jd_vectorizer = TfidfVectorizer()
         jd_vectors = jd_vectorizer.fit_transform(jd_texts)
 
+        print(f"Saving output to: {output_file}")
         with open(output_file, 'wb') as file:
             joblib.dump({
                 'resume_texts': resume_texts,
