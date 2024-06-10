@@ -9,12 +9,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 def train_models(resume_vectors, jd_vectors, labels):
-    # Ensure the shapes of resume_vectors and jd_vectors are the same
-    max_length = max(resume_vectors.shape[0], jd_vectors.shape[0])
-    if resume_vectors.shape[0] < max_length:
-        resume_vectors = np.concatenate([resume_vectors, resume_vectors[:max_length - resume_vectors.shape[0]]], axis=0)
-    elif jd_vectors.shape[0] < max_length:
-        jd_vectors = np.concatenate([jd_vectors, jd_vectors[:max_length - jd_vectors.shape[0]]], axis=0)
+    # Ensure the number of features in resume_vectors and jd_vectors are the same
+    if jd_vectors.shape[1] < resume_vectors.shape[1]:
+        jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], resume_vectors.shape[1] - jd_vectors.shape[1]))))
 
     # Train a logistic regression model
     logistic_model = LogisticRegression()
@@ -48,6 +45,10 @@ if __name__ == "__main__":
         resume_vectors = resume_data['resume_vectors']
         jd_vectors = jd_data['jd_vectors']
 
+        # Ensure the number of features in resume_vectors and jd_vectors are the same
+        if jd_vectors.shape[1] < resume_vectors.shape[1]:
+            jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], resume_vectors.shape[1] - jd_vectors.shape[1]))))
+
         # Compute the cosine similarity between each resume and each job description
         similarity_matrix = cosine_similarity(resume_vectors, jd_vectors)
         labels = np.max(similarity_matrix, axis=1)
@@ -62,4 +63,3 @@ if __name__ == "__main__":
         print("Error: 'data/resume_vectors.pkl' or 'data/jd_vectors.pkl' file not found.")
     except Exception as e:
         print(f"Error: {e}")
-
