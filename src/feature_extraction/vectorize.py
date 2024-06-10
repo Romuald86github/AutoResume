@@ -15,10 +15,10 @@ def vectorize_text(input_dir, output_file):
                 text = file.read().strip()
 
             if text:  # Check if the text is not empty
-                if filename.startswith("resume_"):
+                if filename.startswith("resume_") or "resume" in filename.lower():
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif filename.startswith("job_"):
+                elif filename.startswith("job_") or "job" in filename.lower():
                     jd_texts.append(text)
                     jd_filenames.append(filename)
 
