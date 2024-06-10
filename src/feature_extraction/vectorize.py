@@ -25,20 +25,33 @@ def vectorize_text(input_dir, output_file):
                     logging.info(f"Found resume file: {filename}")
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif filename.startswith("job_") or "job description" in filename.lower():
+                elif filename.startswith("job_") or "job" in filename.lower():
                     logging.info(f"Found job description file: {filename}")
                     jd_texts.append(text)
                     jd_filenames.append(filename)
 
-    if resume_texts and jd_texts:
-        logging.info("Processing resume and job description vectors...")
-        resume_vectorizer = TfidfVectorizer()
-        resume_vectors = resume_vectorizer.fit_transform(resume_texts)
-        logging.info(f"Resume vectors shape: {resume_vectors.shape}")
+    print(f"Length of resume_texts: {len(resume_texts)}")
+    print(f"Length of jd_texts: {len(jd_texts)}")
 
-        jd_vectorizer = TfidfVectorizer()
-        jd_vectors = jd_vectorizer.fit_transform(jd_texts)
-        logging.info(f"Job description vectors shape: {jd_vectors.shape}")
+    if resume_texts or jd_texts:
+        logging.info("Processing resume and job description vectors...")
+        if resume_texts:
+            resume_vectorizer = TfidfVectorizer()
+            resume_vectors = resume_vectorizer.fit_transform(resume_texts)
+            logging.info(f"Resume vectors shape: {resume_vectors.shape}")
+        else:
+            logging.warning("No resume texts found.")
+            resume_vectors = None
+            resume_vectorizer = None
+
+        if jd_texts:
+            jd_vectorizer = TfidfVectorizer()
+            jd_vectors = jd_vectorizer.fit_transform(jd_texts)
+            logging.info(f"Job description vectors shape: {jd_vectors.shape}")
+        else:
+            logging.warning("No job description texts found.")
+            jd_vectors = None
+            jd_vectorizer = None
 
         logging.info(f"Saving output to: {output_file}")
         try:
