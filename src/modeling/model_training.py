@@ -1,7 +1,7 @@
 from sklearn.metrics.pairwise import cosine_similarity
-
-import os
 import joblib
+import requests
+import io
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -35,35 +35,32 @@ def train_models(resume_vectors, jd_vectors, labels):
     rf_mse = mean_squared_error(y_test, y_pred)
     print(f"Random Forest MSE: {rf_mse:.4f}")
 
-    # Save the trained models
-    os.makedirs('models', exist_ok=True)
-    joblib.dump(logistic_model, 'models/logistic_model.pkl')
-    joblib.dump(svm_model, 'models/svm_model.pkl')
-    joblib.dump(rf_model, 'models/rf_model.pkl')
-
     return logistic_model, svm_model, rf_model
 
 if __name__ == "__main__":
     try:
-        data = joblib.load('data/vectors.pkl')
-        resume_vectors = data.get('resume_vectors', None)
-        jd_vectors = data.get('jd_vectors', None)
+        # URL of the file in your GitHub repository
+        url = 'https://raw.githubusercontent.com/Romuald86github/AutoResume/main/data/vectors.pkl'
 
-        if resume_vectors is None or jd_vectors is None:
-            print("Error: 'resume_vectors' or 'jd_vectors' not found in the data file.")
-            exit()
+        # Download the file from the URL
+        response = requests.get(url)
 
-        # Compute the cosine similarity between each resume and each job description
-        similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
+        # Check if the request was successful
+        if response.status_code == 200:
+            # Load the data from the downloaded file
+            data = joblib.load(io.BytesIO(response.content))
 
-        # Find the highest similarity score for each job description and use it as the label
-        labels = np.max(similarity_matrix, axis=0)
+            resume_vectors = data['resume_vectors']
+            jd_vectors = data['jd_vectors']
 
-        logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
-        joblib.dump(logistic_model, 'models/logistic_model.pkl')
-        joblib.dump(svm_model, 'models/svm_model.pkl')
-        joblib.dump(rf_model, 'models/rf_model.pkl')
-    except FileNotFoundError:
-        print("Error: 'data/vectors.pkl' file not found.")
+            # Compute the cosine similarity between each resume and each job description
+            similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
+
+            # Find the highest similarity score for each job description and use it as the label
+            labels = np.max(similarity_matrix, axis=0)
+
+            logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
+        else:
+            print(f"Error: Failed to download the file. Status code: {response.status_code}")
     except Exception as e:
         print(f"Error: {e}")
