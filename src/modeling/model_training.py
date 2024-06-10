@@ -41,6 +41,12 @@ if __name__ == "__main__":
         resume_vectors = resume_data['resume_vectors']
         jd_vectors = jd_data['jd_vectors']
 
+        # Check if the vectors are 0-dimensional arrays
+        if resume_vectors.ndim == 0:
+            resume_vectors = np.expand_dims(resume_vectors, axis=0)
+        if jd_vectors.ndim == 0:
+            jd_vectors = np.expand_dims(jd_vectors, axis=0)
+
         # Concatenate the resume and job description vectors
         X = np.concatenate([resume_vectors, jd_vectors], axis=0)
 
@@ -58,3 +64,4 @@ if __name__ == "__main__":
         print("Error: 'data/resume_vectors.pkl' or 'data/jd_vectors.pkl' file not found.")
     except Exception as e:
         print(f"Error: {e}")
+
