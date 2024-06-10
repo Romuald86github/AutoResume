@@ -1,3 +1,8 @@
+import os
+import joblib
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
 def vectorize_text(input_dir, output_file):
     resume_texts = []
     resume_filenames = []
