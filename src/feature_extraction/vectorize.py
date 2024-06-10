@@ -14,11 +14,11 @@ def vectorize_text(input_dir, output_file):
             with open(file_path, 'r') as file:
                 text = file.read().strip()
 
-            if text:
-                if "resume" in filename.lower():
+            if text:  # Check if the text is not empty
+                if filename.startswith("resume_"):
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif "job" in filename.lower():
+                elif filename.startswith("jd_"):
                     jd_texts.append(text)
                     jd_filenames.append(filename)
 
