@@ -2,7 +2,6 @@ import os
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-
 def vectorize_text(input_dir, output_file):
     resume_texts = []
     resume_filenames = []
@@ -22,7 +21,7 @@ def vectorize_text(input_dir, output_file):
                     print(f"Found resume file: {filename}")
                     resume_texts.append(text)
                     resume_filenames.append(filename)
-                elif filename.startswith("job_") or "job" in filename.lower():
+                elif filename.startswith("job_") or "job description" in filename.lower():
                     print(f"Found job description file: {filename}")
                     jd_texts.append(text)
                     jd_filenames.append(filename)
