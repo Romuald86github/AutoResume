@@ -33,45 +33,36 @@ def vectorize_text(input_dir, output_file):
     print(f"Length of resume_texts: {len(resume_texts)}")
     print(f"Length of jd_texts: {len(jd_texts)}")
 
-    if resume_texts or jd_texts:
-        logging.info("Processing resume and job description vectors...")
-        if resume_texts:
-            resume_vectorizer = TfidfVectorizer()
-            resume_vectors = resume_vectorizer.fit_transform(resume_texts)
-            logging.info(f"Resume vectors shape: {resume_vectors.shape}")
-        else:
-            logging.warning("No resume texts found.")
-            resume_vectors = None
-            resume_vectorizer = None
+    resume_vectorizer, jd_vectorizer = None, None
+    resume_vectors, jd_vectors = None, None
 
-        if jd_texts:
-            jd_vectorizer = TfidfVectorizer()
-            jd_vectors = jd_vectorizer.fit_transform(jd_texts)
-            logging.info(f"Job description vectors shape: {jd_vectors.shape}")
-        else:
-            logging.warning("No job description texts found.")
-            jd_vectors = None
-            jd_vectorizer = None
+    if resume_texts:
+        resume_vectorizer = TfidfVectorizer()
+        resume_vectors = resume_vectorizer.fit_transform(resume_texts)
+        logging.info(f"Resume vectors shape: {resume_vectors.shape}")
 
-        logging.info(f"Saving output to: {output_file}")
-        try:
-            with open(output_file, 'wb') as file:
-                joblib.dump({
-                    'resume_texts': resume_texts,
-                    'resume_vectors': resume_vectors,
-                    'resume_filenames': resume_filenames,
-                    'jd_texts': jd_texts,
-                    'jd_vectors': jd_vectors,
-                    'jd_filenames': jd_filenames,
-                    'resume_vectorizer': resume_vectorizer,
-                    'jd_vectorizer': jd_vectorizer
-                }, file)
-            logging.info("Output saved successfully.")
-        except Exception as e:
-            logging.error(f"Error saving output: {e}")
-    else:
-        logging.warning("No valid text files found in the input directories.")
+    if jd_texts:
+        jd_vectorizer = TfidfVectorizer()
+        jd_vectors = jd_vectorizer.fit_transform(jd_texts)
+        logging.info(f"Job description vectors shape: {jd_vectors.shape}")
+
+    logging.info(f"Saving output to: {output_file}")
+    try:
+        with open(output_file, 'wb') as file:
+            joblib.dump({
+                'resume_texts': resume_texts,
+                'resume_vectors': resume_vectors,
+                'resume_filenames': resume_filenames,
+                'jd_texts': jd_texts,
+                'jd_vectors': jd_vectors,
+                'jd_filenames': jd_filenames,
+                'resume_vectorizer': resume_vectorizer,
+                'jd_vectorizer': jd_vectorizer
+            }, file)
+        logging.info("Output saved successfully.")
+    except Exception as e:
+        logging.error(f"Error saving output: {e}")
 
 if __name__ == "__main__":
-    vectorize_text('data/processed/preprocessed_resumes', 'data/vectors.pkl')
-    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/vectors.pkl')
+    vectorize_text('data/processed/preprocessed_resumes', 'data/vectors_resumes.pkl')
+    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/vectors_job_descriptions.pkl')
