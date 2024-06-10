@@ -53,9 +53,6 @@ if __name__ == "__main__":
             resume_vectors = data['resume_vectors']
             jd_vectors = data['jd_vectors']
 
-            print("resume_vectors shape:", resume_vectors.shape)
-            print("jd_vectors shape:", jd_vectors.shape)
-
             # Compute the cosine similarity between each resume and each job description
             similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
 
@@ -65,5 +62,7 @@ if __name__ == "__main__":
             logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
         else:
             print(f"Error: Failed to download the file. Status code: {response.status_code}")
+    except FileNotFoundError:
+        print("Error: 'data/vectors.pkl' file not found.")
     except Exception as e:
         print(f"Error: {e}")
