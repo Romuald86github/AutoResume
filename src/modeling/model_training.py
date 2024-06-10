@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         if resume_vectors is None or jd_vectors is None:
             print("Error: 'resume_vectors' or 'jd_vectors' not found in the data file.")
-            return
+            exit()
 
         # Compute the cosine similarity between each resume and each job description
         similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
