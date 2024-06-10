@@ -1,152 +1,58 @@
 import os
 import joblib
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-import tensorflow as tf
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D, Input, Lambda
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras import backend as K
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import MeanSquaredError
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 
-def train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd):
-    # Transform the raw text data using the vectorizers
-    X_resumes_transformed = vectorizer_resumes.transform(X_resumes)
-    X_jd_transformed = vectorizer_jd.transform(X_jd)
+def train_models(resume_vectors, jd_vectors, labels):
+    # Split the data into training and testing sets
+    train_size = int(0.8 * len(resume_vectors))
+    X_train, X_test = resume_vectors[:train_size], resume_vectors[train_size:]
+    y_train, y_test = labels[:train_size], labels[train_size:]
 
-    # Align the feature dimensions
-    min_features = min(X_resumes_transformed.shape[1], X_jd_transformed.shape[1])
-    X_resumes_transformed = X_resumes_transformed[:, :min_features]
-    X_jd_transformed = X_jd_transformed[:, :min_features]
+    # Train a logistic regression model
+    logistic_model = LogisticRegression()
+    logistic_model.fit(X_train, y_train)
+    y_pred = logistic_model.predict(X_test)
+    logistic_mse = mean_squared_error(y_test, y_pred)
+    print(f"Logistic Regression MSE: {logistic_mse:.4f}")
 
-    # Compute cosine similarity matrix
-    similarity_matrix = cosine_similarity(X_resumes_transformed.toarray(), X_jd_transformed.toarray())
+    # Train an SVM model
+    svm_model = SVC(kernel='rbf', probability=True)
+    svm_model.fit(X_train, y_train)
+    y_pred = svm_model.predict(X_test)
+    svm_mse = mean_squared_error(y_test, y_pred)
+    print(f"SVM MSE: {svm_mse:.4f}")
 
-    # Create the 'models/' directory if it doesn't exist
+    # Train a random forest model
+    rf_model = RandomForestRegressor()
+    rf_model.fit(X_train, y_train)
+    y_pred = rf_model.predict(X_test)
+    rf_mse = mean_squared_error(y_test, y_pred)
+    print(f"Random Forest MSE: {rf_mse:.4f}")
+
+    # Save the trained models
     os.makedirs('models', exist_ok=True)
+    joblib.dump(logistic_model, 'models/logistic_model.pkl')
+    joblib.dump(svm_model, 'models/svm_model.pkl')
+    joblib.dump(rf_model, 'models/rf_model.pkl')
 
-    # Save the cosine similarity matrix
-    joblib.dump(similarity_matrix, 'models/cosine_similarity_model.pkl')
-
-def train_semantic_similarity_model(X_resumes, X_jd, max_words=5000, max_len=500):
-    tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
-
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
-
-    X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
-    X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
-
-    # Ensure the input tensors have the same number of samples
-    min_samples = min(len(X_resumes_pad), len(X_jd_pad))
-    X_resumes_pad = X_resumes_pad[:min_samples]
-    X_jd_pad = X_jd_pad[:min_samples]
-
-    resume_input = Input(shape=(max_len,), name='resume_input')
-    jd_input = Input(shape=(max_len,), name='jd_input')
-
-    embedding = Embedding(max_words, 128)
-    resume_embedding = embedding(resume_input)
-    jd_embedding = embedding(jd_input)
-
-    merged = tf.keras.layers.concatenate([resume_embedding, jd_embedding], axis=-1)
-
-    x = SpatialDropout1D(0.2)(merged)
-    x = LSTM(100, dropout=0.2, recurrent_dropout=0.2)(x)
-    output = Dense(1, activation='sigmoid')(x)
-
-    model = Model(inputs=[resume_input, jd_input], outputs=output)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    # Create a target tensor with the same length as the input data
-    y = np.ones(len(X_resumes_pad))
-
-    model.fit([X_resumes_pad, X_jd_pad], y, epochs=5, batch_size=64, validation_split=0.2)
-    model.save('models/semantic_similarity_model.h5')
-
-from tensorflow.keras.layers import Layer
-def train_siamese_model(X_resumes, X_jd, max_words=5000, max_len=500):
-    tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
-
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
-
-    X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
-    X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
-
-    # Ensure the input tensors have the same number of samples
-    min_samples = min(len(X_resumes_pad), len(X_jd_pad))
-    X_resumes_pad = X_resumes_pad[:min_samples]
-    X_jd_pad = X_jd_pad[:min_samples]
-
-    class LSTMWrapper(Layer):
-        def __init__(self, units, dropout=0.2, recurrent_dropout=0.2, **kwargs):
-            super(LSTMWrapper, self).__init__(**kwargs)
-            self.units = units
-            self.dropout = dropout
-            self.recurrent_dropout = recurrent_dropout
-            self.lstm = LSTM(units, dropout=dropout, recurrent_dropout=recurrent_dropout, return_sequences=False)
-
-        def call(self, inputs):
-            return self.lstm(tf.expand_dims(inputs, axis=1))
-
-    resume_input = Input(shape=(max_len,))
-    jd_input = Input(shape=(max_len,))
-
-    shared_lstm = LSTMWrapper(100)
-    resume_embedding = shared_lstm(resume_input)
-    jd_embedding = shared_lstm(jd_input)
-
-    def euclidean_distance(vects):
-        x, y = vects
-        return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
-
-    distance = Lambda(euclidean_distance)([resume_embedding, jd_embedding])
-    model = Model(inputs=[resume_input, jd_input], outputs=distance)
-    model.compile(loss=MeanSquaredError(), optimizer=Adam())
-
-    # Create a target tensor with the same length as the input data
-    y = np.zeros(len(X_resumes_pad))
-
-    model.fit([X_resumes_pad, X_jd_pad], y, epochs=5, batch_size=64, validation_split=0.2)
-    model.save('models/siamese_model.h5')
-def train_ranking_model(X_resumes, X_jd, max_words=5000, max_len=500):
-    tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(X_resumes + X_jd)
-
-    X_resumes_seq = tokenizer.texts_to_sequences(X_resumes)
-    X_jd_seq = tokenizer.texts_to_sequences(X_jd)
-
-    X_resumes_pad = pad_sequences(X_resumes_seq, maxlen=max_len)
-    X_jd_pad = pad_sequences(X_jd_seq, maxlen=max_len)
-
-    # Define the ranking model architecture
-    model = Sequential()
-    model.add(Embedding(max_words, 128, input_length=max_len))
-    model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
-    model.add(Dense(1, activation='linear'))
-    model.compile(loss='mse', optimizer='adam')
-
-    # Train the ranking model
-    model.fit(X_resumes_pad, np.arange(len(X_resumes_pad)), epochs=5, batch_size=64, validation_split=0.2)
-    model.save('models/ranking_model.h5')
+    return logistic_model, svm_model, rf_model
 
 if __name__ == "__main__":
-    resumes_data = joblib.load('data/resume_vectors.pkl')
-    jd_data = joblib.load('data/job_description_vectors.pkl')
+    data = joblib.load('data/vectors.pkl')
+    resume_vectors = data['resume_vectors']
+    jd_vectors = data['jd_vectors']
 
-    # Assuming resumes_data and jd_data contain 'raw_texts' and 'vectorizer'
-    X_resumes = resumes_data['raw_texts']
-    vectorizer_resumes = resumes_data['vectorizer']
+    # Compute the cosine similarity between each resume and each job description
+    similarity_matrix = cosine_similarity(resume_vectors, jd_vectors.T)
 
-    X_jd = jd_data['raw_texts']
-    vectorizer_jd = jd_data['vectorizer']
+    # Find the highest similarity score for each job description and use it as the label
+    labels = np.max(similarity_matrix, axis=0)
 
-    train_cosine_similarity_model(X_resumes, X_jd, vectorizer_resumes, vectorizer_jd)
-    train_semantic_similarity_model(X_resumes, X_jd)
-    train_siamese_model(X_resumes, X_jd)
-    train_ranking_model(X_resumes, X_jd)
+    logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
+    joblib.dump(logistic_model, 'models/logistic_model.pkl')
+    joblib.dump(svm_model, 'models/svm_model.pkl')
+    joblib.dump(rf_model, 'models/rf_model.pkl')
