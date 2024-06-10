@@ -8,25 +8,25 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
-def train_models(resume_vectors, jd_vectors, labels):
+def train_models(X, labels):
     # Train a logistic regression model
     logistic_model = LogisticRegression()
-    logistic_model.fit(resume_vectors, labels)
-    y_pred = logistic_model.predict(resume_vectors)
+    logistic_model.fit(X, labels)
+    y_pred = logistic_model.predict(X)
     logistic_mse = mean_squared_error(labels, y_pred)
     print(f"Logistic Regression MSE: {logistic_mse:.4f}")
 
     # Train an SVM model
     svm_model = SVC(kernel='rbf', probability=True)
-    svm_model.fit(resume_vectors, labels)
-    y_pred = svm_model.predict(resume_vectors)
+    svm_model.fit(X, labels)
+    y_pred = svm_model.predict(X)
     svm_mse = mean_squared_error(labels, y_pred)
     print(f"SVM MSE: {svm_mse:.4f}")
 
     # Train a random forest model
     rf_model = RandomForestRegressor()
-    rf_model.fit(resume_vectors, labels)
-    y_pred = rf_model.predict(resume_vectors)
+    rf_model.fit(X, labels)
+    y_pred = rf_model.predict(X)
     rf_mse = mean_squared_error(labels, y_pred)
     print(f"Random Forest MSE: {rf_mse:.4f}")
 
@@ -41,11 +41,14 @@ if __name__ == "__main__":
         resume_vectors = resume_data['resume_vectors']
         jd_vectors = jd_data['jd_vectors']
 
+        # Concatenate the resume and job description vectors
+        X = np.concatenate([resume_vectors, jd_vectors], axis=0)
+
         # Compute the cosine similarity between each resume and each job description
-        similarity_matrix = cosine_similarity(resume_vectors, jd_vectors)
+        similarity_matrix = cosine_similarity(X)
         labels = np.max(similarity_matrix, axis=1)
 
-        logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
+        logistic_model, svm_model, rf_model = train_models(X, labels)
 
         # Save the trained models
         joblib.dump(logistic_model, 'models/logistic_model.pkl')
