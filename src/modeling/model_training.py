@@ -1,3 +1,5 @@
+
+
 import os
 import joblib
 import numpy as np
@@ -5,6 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics.pairwise import cosine_similarity
 
 def train_models(resume_vectors, jd_vectors, labels):
     # Split the data into training and testing sets
