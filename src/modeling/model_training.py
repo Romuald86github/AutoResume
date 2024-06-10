@@ -9,12 +9,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 def train_models(resume_vectors, jd_vectors, labels):
-    # Augment the data to match the shapes
-    if resume_vectors.shape[0] < jd_vectors.shape[0]:
-        resume_vectors = np.repeat(resume_vectors, jd_vectors.shape[0] // resume_vectors.shape[0] + 1, axis=0)[:jd_vectors.shape[0]]
-    elif jd_vectors.shape[0] < resume_vectors.shape[0]:
-        jd_vectors = np.repeat(jd_vectors, resume_vectors.shape[0] // jd_vectors.shape[0] + 1, axis=0)[:resume_vectors.shape[0]]
-
     # Train a logistic regression model
     logistic_model = LogisticRegression()
     logistic_model.fit(resume_vectors, labels)
@@ -48,7 +42,7 @@ if __name__ == "__main__":
         jd_vectors = jd_data['jd_vectors']
 
         # Compute the cosine similarity between each resume and each job description
-        similarity_matrix = resume_vectors @ jd_vectors.T
+        similarity_matrix = cosine_similarity(resume_vectors, jd_vectors)
         labels = np.max(similarity_matrix, axis=1)
 
         logistic_model, svm_model, rf_model = train_models(resume_vectors, jd_vectors, labels)
