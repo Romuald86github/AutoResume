@@ -11,15 +11,16 @@ from sklearn.metrics import mean_squared_error
 def train_models(resume_vectors, jd_vectors, labels):
     # Ensure the number of dimensions in resume_vectors and jd_vectors are 2
     if resume_vectors.ndim == 1:
-        resume_vectors = np.expand_dims(resume_vectors, axis=0)
+        resume_vectors = resume_vectors[np.newaxis, :]
     if jd_vectors.ndim == 1:
-        jd_vectors = np.expand_dims(jd_vectors, axis=0)
+        jd_vectors = jd_vectors[np.newaxis, :]
 
     # Ensure the number of features in resume_vectors and jd_vectors are the same
-    if jd_vectors.shape[1] < resume_vectors.shape[1]:
-        jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], resume_vectors.shape[1] - jd_vectors.shape[1]))))
-    elif jd_vectors.shape[1] > resume_vectors.shape[1]:
-        resume_vectors = np.hstack((resume_vectors, np.zeros((resume_vectors.shape[0], jd_vectors.shape[1] - resume_vectors.shape[1]))))
+    max_features = max(resume_vectors.shape[1], jd_vectors.shape[1])
+    if resume_vectors.shape[1] < max_features:
+        resume_vectors = np.hstack((resume_vectors, np.zeros((resume_vectors.shape[0], max_features - resume_vectors.shape[1]))))
+    if jd_vectors.shape[1] < max_features:
+        jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], max_features - jd_vectors.shape[1]))))
 
     # Train a logistic regression model
     logistic_model = LogisticRegression()
@@ -55,15 +56,16 @@ if __name__ == "__main__":
 
         # Ensure the number of dimensions in resume_vectors and jd_vectors are 2
         if resume_vectors.ndim == 1:
-            resume_vectors = np.expand_dims(resume_vectors, axis=0)
+            resume_vectors = resume_vectors[np.newaxis, :]
         if jd_vectors.ndim == 1:
-            jd_vectors = np.expand_dims(jd_vectors, axis=0)
+            jd_vectors = jd_vectors[np.newaxis, :]
 
         # Ensure the number of features in resume_vectors and jd_vectors are the same
-        if jd_vectors.shape[1] < resume_vectors.shape[1]:
-            jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], resume_vectors.shape[1] - jd_vectors.shape[1]))))
-        elif jd_vectors.shape[1] > resume_vectors.shape[1]:
-            resume_vectors = np.hstack((resume_vectors, np.zeros((resume_vectors.shape[0], jd_vectors.shape[1] - resume_vectors.shape[1]))))
+        max_features = max(resume_vectors.shape[1], jd_vectors.shape[1])
+        if resume_vectors.shape[1] < max_features:
+            resume_vectors = np.hstack((resume_vectors, np.zeros((resume_vectors.shape[0], max_features - resume_vectors.shape[1]))))
+        if jd_vectors.shape[1] < max_features:
+            jd_vectors = np.hstack((jd_vectors, np.zeros((jd_vectors.shape[0], max_features - jd_vectors.shape[1]))))
 
         # Compute the cosine similarity between each resume and each job description
         similarity_matrix = cosine_similarity(resume_vectors, jd_vectors)
