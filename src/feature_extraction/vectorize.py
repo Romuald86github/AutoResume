@@ -64,5 +64,5 @@ def vectorize_text(input_dir, output_file):
         logging.error(f"Error saving output: {e}")
 
 if __name__ == "__main__":
-    vectorize_text('data/processed/preprocessed_resumes', 'data/vectors_resumes.pkl')
-    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/vectors_job_descriptions.pkl')
+    vectorize_text('data/processed/preprocessed_resumes', 'data/resume_vectors.pkl')
+    vectorize_text('data/processed/preprocessed_job_descriptions', 'data/jd_vectors.pkl')
