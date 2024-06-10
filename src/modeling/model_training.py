@@ -9,11 +9,12 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 def train_models(resume_vectors, jd_vectors, labels):
-    # Ensure the number of dimensions in resume_vectors and jd_vectors are 2
-    if resume_vectors.ndim == 1:
-        resume_vectors = resume_vectors[np.newaxis, :]
-    if jd_vectors.ndim == 1:
-        jd_vectors = jd_vectors[np.newaxis, :]
+    # Ensure the number of dimensions in resume_vectors and jd_vectors are the same
+    if resume_vectors.ndim != jd_vectors.ndim:
+        if resume_vectors.ndim == 1:
+            resume_vectors = resume_vectors[:, np.newaxis]
+        else:
+            jd_vectors = jd_vectors[:, np.newaxis]
 
     # Ensure the number of features in resume_vectors and jd_vectors are the same
     max_features = max(resume_vectors.shape[1], jd_vectors.shape[1])
@@ -54,11 +55,12 @@ if __name__ == "__main__":
         resume_vectors = resume_data['resume_vectors']
         jd_vectors = jd_data['jd_vectors']
 
-        # Ensure the number of dimensions in resume_vectors and jd_vectors are 2
-        if resume_vectors.ndim == 1:
-            resume_vectors = resume_vectors[np.newaxis, :]
-        if jd_vectors.ndim == 1:
-            jd_vectors = jd_vectors[np.newaxis, :]
+        # Ensure the number of dimensions in resume_vectors and jd_vectors are the same
+        if resume_vectors.ndim != jd_vectors.ndim:
+            if resume_vectors.ndim == 1:
+                resume_vectors = resume_vectors[:, np.newaxis]
+            else:
+                jd_vectors = jd_vectors[:, np.newaxis]
 
         # Ensure the number of features in resume_vectors and jd_vectors are the same
         max_features = max(resume_vectors.shape[1], jd_vectors.shape[1])
@@ -81,4 +83,3 @@ if __name__ == "__main__":
         print("Error: 'data/resume_vectors.pkl' or 'data/jd_vectors.pkl' file not found.")
     except Exception as e:
         print(f"Error: {e}")
-
